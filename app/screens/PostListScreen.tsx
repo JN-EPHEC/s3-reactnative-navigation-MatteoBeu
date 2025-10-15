@@ -1,7 +1,11 @@
-import React from "react";
-import { StyleSheet, Pressable, FlatList, Text, View } from "react-native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../_layout";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import * as React from "react";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+// Define RootStackParamList locally since '../types/navigation' is missing
+type RootStackParamList = {
+  PostList: undefined;
+  PostDetail: { postId: string; title: string; content: string };
+};
 
 type Props = NativeStackScreenProps<RootStackParamList, "PostList">;
 
@@ -10,59 +14,66 @@ const POSTS = [
     id: "1",
     title: "React Native is Awesome",
     content:
-      "React Native lets you build mobile apps using only JavaScript. Learn once, write anywhere! This is a fake post used for the exercise.",
+      "React Native lets you build mobile apps using React. Write once, run on iOS and Android!",
   },
   {
     id: "2",
     title: "State Management Tips",
     content:
-      "Managing state can be tricky. Use simple patterns first, then introduce libraries when needed. This is sample content for the exercise.",
+      "Start simple with useState and Context. Reach for libraries like Zustand or Redux when needed.",
   },
   {
     id: "3",
     title: "UI Design Principles",
     content:
-      "Good UI is about clarity and consistency. Keep interfaces simple and predictable. More sample content here.",
+      "Consistency, hierarchy, and feedback are key. Keep components small and reusable.",
   },
   {
     id: "4",
-    title: "Optimizing Performance",
+    title: "Navigation Basics",
     content:
-      "Profile first, then optimize. Use proper list virtualization and avoid unnecessary renders. This is dummy text.",
+      "Stacks for drill-down flows, tabs for top-level sections, drawers for less frequent actions.",
   },
 ];
 
 export default function PostListScreen({ navigation }: Props) {
-  function renderItem({ item }: { item: (typeof POSTS)[number] }) {
-    return (
-      <>
-        {/* Replace this with your code here for each item to render (Use Pressable Component) */}
-      </>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      {/* Replace this with your code to render the list of items */}
-    </View>
+    <FlatList
+      contentContainerStyle={styles.container}
+      data={POSTS}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() =>
+            navigation.navigate("PostDetail", {
+              postId: item.id,
+              title: item.title,
+              content: item.content,
+            })
+          }
+        >
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
+      )}
+      ItemSeparatorComponent={() => <View style={styles.sep} />}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
+  container: { padding: 16 },
+  card: {
+    backgroundColor: "#fff",
     padding: 16,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    elevation: 1,
   },
-  item: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-    backgroundColor: "rgba(0,0,0,0.03)",
-  },
-  itemPressed: {
-    opacity: 0.7,
-  },
+  title: { fontSize: 16, fontWeight: "600" },
+  chevron: { fontSize: 20, opacity: 0.4 },
+  sep: { height: 12 },
 });
